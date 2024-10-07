@@ -17,6 +17,7 @@ createRoot(document.getElementById('root')).render(
           {/* Protected route */}
           <Route element={<RequireAuth />}>
             <Route path="/" element={<HomePage />} />
+            <Route path="/folders/:folderId" element={<HomePage/>} />
             <Route path="/other" element={<OtherPage />} />
           </Route>
         </Routes>

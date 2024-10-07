@@ -5,7 +5,7 @@ import propTypes from "prop-types";
 
 function AuthProvider({ children }) {
     const [user, setUser] = useState(null);
-    const [auth_loading, setLoading] = useState(true);
+    const [authLoading, setAuthLoading] = useState(true);
     const location = useLocation();
 
     function loginGoogle() {
@@ -26,23 +26,31 @@ function AuthProvider({ children }) {
         await fetch('/test/logout');
     }
 
-    const delay = (ms) => new Promise(res => setTimeout(res, ms));
-
     // Check session on load
     useEffect(() => {
         (async () => {
-            console.log('setting loading to true');
-            setLoading(true);
-            console.log('getting user...');
-            await getUser();
-            await delay(500);
-            console.log('setting loading to false');
-            setLoading(false);
+            try {
+                console.log('setting loading to true');
+                setAuthLoading(true);
+                console.log('getting user...');
+                await getUser();
+            } catch {
+                setUser(null);
+            } finally {
+                console.log('setting loading to false');
+                setAuthLoading(false);
+            }
         })();
-    }, [location]);
+
+        return () => {
+            console.log('cleanup authprovider');
+            setAuthLoading(true);
+            console.log('cleanup finished');
+        }
+    }, [location.pathname]);
     
     return (
-        <authContext.Provider value={{ user, auth_loading, loginGoogle, logout }}>
+        <authContext.Provider value={{ user, authLoading, setAuthLoading, loginGoogle, logout }}>
             {children}
         </authContext.Provider>
     )
